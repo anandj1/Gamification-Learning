@@ -1,0 +1,85 @@
+{% extends 'layouts/student.html' %}
+{% load static %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2 class="text-primary">{{ title }}</h2>
+    </div>
+</div>
+
+<div class="row mt-5 mb-5">
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="text-warning fs-1">
+                    <div class="row">
+                        <div class="col-6">
+                            <i class='bx bx-coin-stack'></i>
+                        </div>
+                        <div class="col-6 text-right">
+                            {{ coins.coin }}
+                        </div>
+                    </div>
+                </div>
+                <h5 class="text-muted">Your coins</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="text-info fs-1">
+                    <div class="row">
+                        <div class="col-6">
+                            <i class='bx bx-math'></i>  
+                        </div>
+                        <div class="col-6 text-right">
+                            {{ quiz_played }}
+                        </div>
+                    </div> 
+                </div>
+                <h5 class="text-muted">Quiz Played</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="text-success fs-1">
+                    <div class="row">
+                        <div class="col-6">
+                            <i class='bx bx-link-external'></i>
+                        </div>
+                        <div class="col-6 text-right">
+                            {{ extra_cs }}
+                        </div>
+                    </div> 
+                </div>
+                <h5 class="text-muted">Extra Cirriculars</h5>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-5">
+    <div class="col-md-12">
+        <h4>Leaderboard</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <td>Name</td>
+                    <td>Coins</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in most_coins %}
+                <tr>
+                    <td>{{ c.profile }}</td>
+                    <td>{{ c.coin }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

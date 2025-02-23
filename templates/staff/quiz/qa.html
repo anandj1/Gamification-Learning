@@ -1,0 +1,84 @@
+{% extends 'layouts/staff.html' %}
+{% load static %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2 class="text-primary">{{ title }}</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card shadow">
+            <div class="card-body">
+                <form action="{% url 'st-quiz-qa' %}?qid={{ question_id }}" method="post">
+                    <h4>New Question</h4>
+                    {% csrf_token %}
+                    <div class="form-group mb-3">
+                        <label for="question">Question</label>
+                        <textarea name="question" id="question" placeholder="Enter question" rows="5" class="form-control" autocomplete="off"></textarea>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="option_1">Option 1</label>
+                        <textarea name="option_1" id="option_1" placeholder="Enter option_1" class="form-control" autocomplete="off"></textarea>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="option_2">Option 2</label>
+                        <textarea name="option_2" id="option_2" placeholder="Enter option_2" class="form-control" autocomplete="off"></textarea>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="option_3">Option 3</label>
+                        <textarea name="option_3" id="option_3" placeholder="Enter option_3" class="form-control" autocomplete="off"></textarea>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="option_4">Option 4</label>
+                        <textarea name="option_4" id="option_4" placeholder="Enter option_4" class="form-control" autocomplete="off"></textarea>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="right_option">Right Option</label>
+                        <textarea name="right_option" id="right_option" placeholder="Enter right_option (Just copy & paste from above.)" class="form-control" autocomplete="off"></textarea>
+                    </div>
+                    <div class="form-group mb-3">
+                        <button type="submit" class="btn btn-primary"><i class="bx bx-save"></i> Add</button>
+                        <button type="clear" class="btn btn-danger"><i class="bx bx-x-circle"></i> Clear</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <h4>Q&A's List</h4>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Question</th>
+                        <th>Option 1</th>
+                        <th>Option 2</th>
+                        <th>Option 3</th>
+                        <th>Option 4</th>
+                        <th>Right Option</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in qas %}
+                    <tr>
+                        <td>{{ i.question }}</td>
+                        <td>{{ i.option_1 }}</td>
+                        <td>{{ i.option_2 }}</td>
+                        <td>{{ i.option_3 }}</td>
+                        <td>{{ i.option_4 }}</td>
+                        <td>{{ i.right_option }}</td>
+                        <td>
+                            <a href="{% url 'st-edit-quiz-qa' %}?qid={{ question_id }}&qaid={{ i.id }}" class="btn btn-info btn-sm"><i class='bx bx-edit'></i> Edit</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

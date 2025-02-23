@@ -1,0 +1,65 @@
+{% extends 'layouts/staff.html' %}
+{% load static %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2 class="text-primary">{{ title }}</h2>
+    </div>
+</div>
+
+<div class="row my-3">
+    <div class="col-md-12">
+        <h4>New Record</h4>
+        <form action="{% url 'st-best-performer' %}" method="post" class="row">
+            {% csrf_token %}
+            <div class="form-group col-md-6 mb-3">
+                <label for="title">Title</label>
+                <select name="title" id="title" class="form-control" required>
+                    <option value="">Select</option>
+                    <option value="Creative Idea">Creative Idea</option>
+                    <option value="Punctual Student">Punctual Student</option>
+                    <option value="Best Presentor">Best Presentor</option>
+                </select>
+            </div>
+            <div class="form-group col-md-4 mb-3">
+                <label for="student">Student</label>
+                <select name="student" id="student" class="form-control" required>
+                    <option value="">Select</option>
+                    {% for i in stds %}
+                    <option value="{{ i.profile_id }}">{{ i.profile.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group col-md-12 mb-3">
+                <button type="submit" class="btn btn-primary"><i class="bx bx-save"></i> Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row my-3">
+    <div class="col-md-12">
+        <h4>Your Records</h4>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Student</th> 
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for x in discussions %}
+                    <tr>
+                        <td>{{ x.title }}</td>
+                        <td>{{ x.student_profile.name }}</td>
+                        <td>{{ x.date }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

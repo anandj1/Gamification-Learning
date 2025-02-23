@@ -1,0 +1,39 @@
+{% extends 'layouts/student.html' %}
+{% load static %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2 class="text-primary">{{ title }}</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <h4>Events</h4>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Fee</th>
+                        <th>Redeem</th>
+                        <th>Date</th>
+                        <th>Apply</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for e in events %}
+                    <tr>
+                        <td>{{ e.title }}</td>
+                        <td>₹{{ e.fee }}</td>
+                        <td>{{ e.redeem }}</td>
+                        <td>{{ e.on_date }}</td>
+                        <td><a href="{% url 'std-event-apply' e.id %}">Apply</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'layouts/admin.html' %}
+{% load static %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2 class="text-primary">{{ title }}</h2>
+    </div>
+</div>
+
+<div class="row my-3">
+    <div class="col-md-12">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Staff</th>
+                        <th>Student</th>
+                        <th>Feedback</th>
+                        <th>Rating</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in ratings %}
+                    <tr>
+                        <td>{{ r.staff_profile }}</td>
+                        <td>{{ r.student_profile }}</td>
+                        <td>{{ r.feedback }}</td>
+                        <td>{{ r.rating }}</td>
+                        <td>{{ r.date }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

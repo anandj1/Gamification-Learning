@@ -1,0 +1,69 @@
+{% extends 'layouts/staff.html' %}
+{% load static %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2 class="text-primary">{{ title }}</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card shadow">
+            <div class="card-body">
+                <form action="{% url 'st-extra-cirricular' %}" method="post">
+                    {% csrf_token %}
+                    <div class="form-group mb-3">
+                        <label for="student">Student</label>
+                        <select name="student" id="student" class="form-control" required>
+                            <option value="">Select</option>
+                            {% for i in stds %}
+                            <option value="{{ i.profile_id }}">{{ i.profile.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="extra_type">Level</label>
+                        <select name="extra_type" id="extra_type" class="form-control" required>
+                            <option value="">Select</option>
+                            <option value="International">International</option>
+                            <option value="National">National</option>
+                            <option value="Inter University">Inter University</option>
+                            <option value="College Level">College Level</option>
+                        </select>
+                    </div>
+                    <div class="form-group mb-3">
+                        <button type="submit" class="btn btn-primary"><i class="bx bx-save"></i> Add</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <h4>Coins distributed by you</h4>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Level</th>
+                        <th>Coins</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in exts %}
+                    <tr>
+                        <td>{{ i.student_profile.name }}</td>
+                        <td>{{ i.level }}</td>
+                        <td>{{ i.coin }}</td>
+                        <td>{{ i.date }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

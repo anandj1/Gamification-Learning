@@ -1,0 +1,89 @@
+{% extends 'layouts/admin.html' %}
+{% load static %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2 class="text-primary">{{ title }}</h2>
+    </div>
+</div>
+
+<div class="row my-3">
+    <div class="col-md-12">
+        <h3 class="text-info">Badges</h3>
+    </div>
+
+    <div class="col-md-12 mt-2">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="text-warning text-center">Most Earned</h4>
+                <div class="row mt-2 text-center">
+                    <div class="col-md-4">
+                        <h4>1st</h4>
+                        {{ most_coins.0.student }} with {{ most_coins.0.coin }} coins.
+                    </div>
+                    <div class="col-md-4">
+                        <h4>2nd</h4>
+                        {{ most_coins.1.student }} with {{ most_coins.1.coin }} coins.
+                    </div>
+                    <div class="col-md-4">
+                        <h4>3rd</h4>
+                        {{ most_coins.2.student }} with {{ most_coins.2.coin }} coins.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+
+    <div class="col-md-12 mt-5">
+        <h3 class="text-info">Best Perfomers</h3>
+    </div>
+
+    <div class="col-md-12 mt-2">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Title</th>
+                    <th>Badge</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in best_performers %}
+                <tr>
+                    <td>{{ i.student_profile }}</td>
+                    <td>{{ i.name }}</td>
+                    <td>{{ i.badge }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="col-md-12 mt-5">
+        <h3 class="text-info">Best Gamers</h3>
+    </div>
+
+    <div class="col-md-12 mt-2">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Coins</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in games_list %}
+                {% if i.coin > 0 %}
+                <tr>
+                    <td>{{ i.name }}</td>
+                    <td>{{ i.coin }}</td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

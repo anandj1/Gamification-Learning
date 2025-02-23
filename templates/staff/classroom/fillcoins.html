@@ -1,0 +1,47 @@
+{% extends 'layouts/staff.html' %}
+{% load static %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2 class="text-primary">{{ title }}</h2>
+    </div>
+</div>
+<div class="row my-3">
+    <div class="col-md-12">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Enrollment</th>
+                        <th>Roll No</th>
+                        <th>Coins</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for x in students %}
+                    <tr>
+                        <td>{{ x.profile.name }}</td>
+                        <td>{{ x.student.enrollment }}</td>
+                        <td>{{ x.student.rollno }}</td>
+                        <td class="w-25">
+                            {% if x.coins < 1 %}
+                            <form action="{% url 'st-cr-discussion-fill-coins-store' x.id %}" method="post">
+                                {% csrf_token %}
+                                <div class="input-group">
+                                    <input type="number" name="coins" id="coins" min="0" max="100" placeholder="Enter coins" value="{{ x.coins }}" class="form-control">
+                                    <button type="submit" class="btn btn-primary"><i class="bx bx-save"></i> Add</button>
+                                </div>
+                            </form>
+                            {% else %}
+                            {{ x.coins }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

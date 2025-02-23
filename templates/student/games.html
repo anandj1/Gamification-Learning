@@ -1,0 +1,108 @@
+{% extends 'layouts/student.html' %}
+{% load static %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2 class="text-primary">{{ title }}</h2>
+    </div>
+</div>
+
+<div class="row my-3">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body py-3">
+                <h4 class="mb-3">Memory Puzzle Game</h4>
+                <div class="card-text mb-3">
+                    In this game we will create 3 levels: easy, medium and hard. At the start of the game the shapes are hidden. The player clicks on the tiles to uncover the tile and when two similar tiles are uncovered the score increases. To complete the game the user has to uncover all the pairs of shapes. After completion of the game, the number of moves required to complete the game is also displayed on the screen.
+                </div>
+                <form action="{% url 'games-memory-puzzle' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">Start Game</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body py-3">
+                <h4 class="mb-3">AI Coding Challenge</h4>
+                <div class="card-text mb-3">
+                    Welcome to the AI Coding Challenge! 🎮💻
+                    Remember those old-school quiz games that tested our knowledge and quick thinking? Well, we’re bringing that nostalgia back with a modern twist! 😎 Instead of just answering random trivia, this time you get to level up your coding skills while tackling fun and challenging programming questions! 🧑‍💻🚀
+                    
+                    Just like in a classic quiz game, every correct answer earns you points, and each wrong answer is a learning opportunity! 💡 But don’t worry – you’ll get motivational messages and hints to help you on your journey. As you improve, AI will dynamically adjust the difficulty to keep things exciting! 🤖🔥
+                    
+                    So, are you ready to test your coding knowledge, boost your problem-solving skills, and climb to the top? Let's play! 🎯💪
+                    
+    
+                    </div>
+                <form action="{% url 'games-hangman' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">Start Game</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body py-3">
+                <h4 class="mb-3">MYSQL</h4>
+                <div class="card-text mb-3">
+                    Welcome to the Ultimate MySQL Challenge! 🎮🛢️
+                    Get ready to put your database skills to the test in an exciting and interactive way! 😎 Whether you're a beginner or an SQL pro, this game will challenge you with real-world MySQL questions, helping you sharpen your skills while having fun. 🧑‍💻🚀
+                    
+                    In this AI-powered quiz, every correct answer earns you points, and every mistake is a chance to learn! 💡 But don’t worry—motivational messages and helpful hints will guide you along the way. The AI Difficulty Manager ensures that as you improve, the questions become more challenging, keeping you engaged and pushing your limits! 🤖🔥
+                    
+                    Think you have what it takes to master SQL, optimize queries, and conquer database challenges? Let's find out! 🎯💪
+                </div>
+                <form action="{% url 'games-keyboardjunp' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">Start Game</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row my-5">
+    <div class="col-md-6">
+        <!-- <h4>Top 5 Memory puzzle gamer</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Time</th>
+                </tr>
+                <tr>
+                    {% for i in memory_puzzle_top %}
+                    <tr>
+                        <td>{{ i.profile.name }}</td>
+                        <td>{{ i.seconds }} seconds</td>
+                    </tr>
+                    {% endfor %}
+                </tr>
+            </thead>
+        </table> -->
+    </div>
+
+    <div class="col-md-6">
+        <!-- <h4>Top 5 Keyboard jump gamer</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Time</th>
+                </tr>
+                <tr>
+                    {% for i in keyboard_top %}
+                    <tr>
+                        <td>{{ i.profile.name }}</td>
+                        <td>{{ i.seconds }} seconds</td>
+                    </tr>
+                    {% endfor %}
+                </tr>
+            </thead>
+        </table> -->
+    </div>
+</div>
+{% endblock %}

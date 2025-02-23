@@ -1,0 +1,62 @@
+{% extends 'layouts/staff.html' %}
+{% load static %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2 class="text-primary">{{ title }}</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card shadow">
+            <div class="card-body">
+                <h4>New Quiz</h4>
+                <form action="{% url 'st-quiz' %}" method="post">
+                    {% csrf_token %}
+                    <div class="form-group mb-3">
+                        <label for="name">Name</label>
+                        <input type="text" name="name" placeholder="Enter name" autocomplete="off" required id="name" class="form-control" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="each_point">Each Question Point</label>
+                        <input type="number" name="each_point" placeholder="Points each question carry" autocomplete="off" required id="each_point" class="form-control" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <button type="submit" class="btn btn-primary"><i class="bx bx-save"></i> Add</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <h4>Student List</h4>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Each Points</th>
+                        <th>Total</th>
+                        <th>Created at</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in quizs %}
+                    <tr>
+                        <td>{{ i.name }}</td>
+                        <td>{{ i.each_point }} point(s)</td>
+                        <td>{{ i.total }} point(s)</td>
+                        <td>{{ i.date }}</td>
+                        <td>
+                            <a href="{% url 'st-quiz-qa' %}?qid={{ i.id }}" class="btn btn-info btn-sm"><i class='bx bx-detail'></i> Questions & answers</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

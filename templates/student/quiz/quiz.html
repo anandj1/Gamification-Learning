@@ -1,0 +1,29 @@
+{% extends 'layouts/student.html' %}
+{% load static %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2 class="text-primary">{{ title }}</h2>
+    </div>
+</div>
+
+<div class="row">
+    {% for x in quizs %}
+    <div class="col-md-4 mb-3">
+        <div class="card shadow">
+            <div class="card-body">
+                <h4>{{ x.name }}</h4>
+                <p class="card-text">
+                    Each question carries <i class="bx bxs-coin-stack text-warning"></i> {{ x.each_point }} coins.<br>
+                    Total questions: {% widthratio x.total x.each_point 1 %}
+                </p>
+                <p class="card-text">
+                    <small>Created by: {{ x.staff.profile }}</small>
+                </p>
+                <a href="{% url 'std-play-quiz' x.id %}" class="btn btn-success w-100"><i class="bx bx-bulb"></i> Get Started</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

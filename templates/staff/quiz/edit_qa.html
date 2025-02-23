@@ -1,0 +1,50 @@
+{% extends 'layouts/staff.html' %}
+{% load static %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2 class="text-primary">{{ title }}</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card shadow">
+            <div class="card-body">
+                <form action="{% url 'st-edit-quiz-qa' %}?qid={{ question_id }}&qaid={{ qa.id }}" method="post">
+                    <h4>New Question</h4>
+                    {% csrf_token %}
+                    <div class="form-group mb-3">
+                        <label for="question">Question</label>
+                        <textarea name="question" id="question" placeholder="Enter question" rows="5" class="form-control" autocomplete="off">{{ qa.question }}</textarea>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="option_1">Option 1</label>
+                        <textarea name="option_1" id="option_1" placeholder="Enter option_1" class="form-control" autocomplete="off">{{ qa.option_1 }}</textarea>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="option_2">Option 2</label>
+                        <textarea name="option_2" id="option_2" placeholder="Enter option_2" class="form-control" autocomplete="off">{{ qa.option_2 }}</textarea>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="option_3">Option 3</label>
+                        <textarea name="option_3" id="option_3" placeholder="Enter option_3" class="form-control" autocomplete="off">{{ qa.option_3 }}</textarea>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="option_4">Option 4</label>
+                        <textarea name="option_4" id="option_4" placeholder="Enter option_4" class="form-control" autocomplete="off">{{ qa.option_4 }}</textarea>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="right_option">Right Option</label>
+                        <textarea name="right_option" id="right_option" placeholder="Enter right_option (Just copy & paste from above.)" class="form-control" autocomplete="off">{{ qa.right_option }}</textarea>
+                    </div>
+                    <div class="form-group mb-3">
+                        <button type="submit" class="btn btn-warning"><i class="bx bx-save"></i> Update</button>
+                        <a href="{% url 'st-quiz-qa' %}?qid={{ question_id }}" class="btn btn-danger"><i class="bx bx-x-circle"></i> Back</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

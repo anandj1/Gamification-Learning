@@ -1,0 +1,39 @@
+{% extends 'layouts/student.html' %}
+{% load static %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2 class="text-primary">{{ title }}</h2>
+    </div>
+</div>
+<div class="row my-3">
+    <div class="col-md-12">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Day</th>
+                        <th>Staff</th>
+                        <th>Status</th>
+                        <th>Extra</th>
+                        <th>Coins</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for x in data %}
+                    <tr>
+                        <td>{{ x.attendance.date }}</td>
+                        <td>{{ x.attendance.day }}</td>
+                        <td>{{ x.staff_profile.name }}</td>
+                        <th>{{ x.status }}</th>
+                        <th>{{ x.is_extra }}</th>
+                        <td>{{ x.coin }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

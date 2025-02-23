@@ -1,0 +1,15 @@
+{% extends 'layouts/user.html' %}
+{% load static %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2 class="text-primary">{{ title }}</h2>
+    </div>
+</div>
+
+<div class="row mt-5 mb-5">
+    <div class="col-md-12">
+        <img src="{% static 'images/bg/02.jpg' %}" alt="image" class="img-fluid">
+    </div>
+</div>
+{% endblock %}

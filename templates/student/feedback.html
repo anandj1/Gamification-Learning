@@ -1,0 +1,60 @@
+{% extends 'layouts/student.html' %}
+{% load static %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2 class="text-primary">{{ title }}</h2>
+    </div>
+</div>
+
+<div class="row my-3">
+    <div class="col-md-4">
+        <form action="{% url 'std-feedback' %}" method="post">
+            {% csrf_token %}
+            <div class="form-group mb-3">
+                <label for="staff">Staff</label>
+                <select name="staff" id="staff" class="form-control">
+                    <option value="">Select</option>
+                    {% for s in staffs %}
+                    <option value="{{ s.id }}">{{ s.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group mb-3">
+                <label for="feedback">Feedback</label>
+                <textarea name="feedback" id="feedback" cols="30" rows="10" class="form-control" placeholder="Your feedback for the staff"></textarea>
+            </div>
+            <div class="form-group mb-3">
+                <label for="rating">Rate</label>
+                <input type="number" name="rating" id="rating" min="0" max="10" placeholder="Rate within 0 - 10" class="form-control">
+            </div>
+            <div class="form-group mb-3">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="col-md-8">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Staff</th>
+                        <th>Feedback</th>
+                        <th>Rating</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in my_ratings %}
+                    <tr>
+                        <td>{{ r.staff_profile }}</td>
+                        <td>{{ r.feedback }}</td>
+                        <td>{{ r.rating }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
