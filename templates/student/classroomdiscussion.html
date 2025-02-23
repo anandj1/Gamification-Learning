@@ -1,33 +1,79 @@
 {% extends 'layouts/student.html' %}
 {% load static %}
 {% block content %}
-<div class="row">
+<div class="container my-4">
+  <div class="row">
     <div class="col-md-12">
-        <h2 class="text-primary">{{ title }}</h2>
+      <h2 class="text-primary">{{ title }}</h2>
+      <hr>
     </div>
-</div>
-<div class="row my-3">
-    <div class="col-md-12">
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>Staff</th>
-                        <th>Coins</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for x in data %}
-                    <tr>
-                        <td>{{ x.discussion.name }}</td>
-                        <td>{{ x.discussion.profile.name }}</td>
-                        <td>{{ x.coins }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+  </div>
+  
+  <div class="row">
+    {% for lecture in lectures %}
+    <div class="col-md-6 col-lg-4 mb-4">
+      <div class="card h-100">
+        {% if lecture.video_url %}
+        <div class="embed-responsive embed-responsive-16by9">
+          <iframe class="embed-responsive-item" src="{{ lecture.video_url }}" allowfullscreen></iframe>
         </div>
+        {% else %}
+        <img src="{% static 'images/default-video.jpg' %}" class="card-img-top" alt="No Video Available">
+        {% endif %}
+        
+        <div class="card-body">
+          <h5 class="card-title">{{ lecture.title }}</h5>
+          {% if lecture.description %}
+          <p class="card-text">{{ lecture.description }}</p>
+          {% endif %}
+        </div>
+        
+        <div class="card-footer">
+          <small class="text-muted">By: {{ lecture.staff.name }}</small>
+        </div>
+      </div>
     </div>
+    {% empty %}
+      <div class="col-12">
+        <button class="custom-btn" onclick="openPlaylist('https://youtube.com/playlist?list=PL7wwY6Ln64K4Ev1KQMNwudrh4YqtCTHf3&feature=shared')">
+          Python Lectures
+      </button>
+  
+      <button class="custom-btn" onclick="openPlaylist('https://www.youtube.com/playlist?list=PLulo_Xte7NLemxb_YvsbxMCuIkKzmA4de')">
+          MySQL Lectures
+      </button>
+  </div>
+  
+  <style>
+      .custom-btn {
+          width: 250px;
+          height: 80px;
+          font-size: 20px;
+          color: blue;
+          background-color: white;
+          border: 2px solid blue;
+          border-radius: 10px;
+          margin: 10px;
+          cursor: pointer;
+          font-weight: bold;
+          transition: 0.3s ease-in-out;
+      }
+  
+      /* Hover effect */
+      .custom-btn:hover {
+          background-color: blue;
+          color: white;
+          transform: scale(1.05);
+      }
+  </style>
+  
+  <script>
+      function openPlaylist(url) {
+          window.open(url, '_blank'); // Opens in a new tab
+      }
+  </script>
+      </div>
+    {% endfor %}
+  </div>
 </div>
-{% endblock %}
+{% endblock %}
