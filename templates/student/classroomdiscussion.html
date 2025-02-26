@@ -1,79 +1,87 @@
 {% extends 'layouts/student.html' %}
 {% load static %}
 {% block content %}
-<div class="container my-4">
-  <div class="row">
-    <div class="col-md-12">
-      <h2 class="text-primary">{{ title }}</h2>
-      <hr>
+
+<style>
+    .chatbot-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .chatbot-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .chatbot-header h2 {
+        color: #2c3e50;
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+    }
+    .chatbot-header p {
+        color: #7f8c8d;
+        font-size: 1.1rem;
+    }
+    .chatbot-frame-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    .chatbot-frame {
+        width: 100%;
+        height: 600px;
+        border: none;
+    }
+    .features-section {
+        margin-top: 40px;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 12px;
+    }
+    .features-section h3 {
+        color: #2c3e50;
+        margin-bottom: 20px;
+    }
+    .feature-list {
+        list-style: none;
+        padding: 0;
+    }
+    .feature-list li {
+        margin-bottom: 10px;
+        padding-left: 25px;
+        position: relative;
+    }
+    .feature-list li:before {
+        content: "✓";
+        position: absolute;
+        left: 0;
+        color: #27ae60;
+    }
+</style>
+
+<div class="chatbot-container">
+    <div class="chatbot-header">
+        <h2>AI Learning Assistant</h2>
+        <p>Get instant help with your studies, ask questions, and explore new concepts</p>
     </div>
-  </div>
-  
-  <div class="row">
-    {% for lecture in lectures %}
-    <div class="col-md-6 col-lg-4 mb-4">
-      <div class="card h-100">
-        {% if lecture.video_url %}
-        <div class="embed-responsive embed-responsive-16by9">
-          <iframe class="embed-responsive-item" src="{{ lecture.video_url }}" allowfullscreen></iframe>
-        </div>
-        {% else %}
-        <img src="{% static 'images/default-video.jpg' %}" class="card-img-top" alt="No Video Available">
-        {% endif %}
-        
-        <div class="card-body">
-          <h5 class="card-title">{{ lecture.title }}</h5>
-          {% if lecture.description %}
-          <p class="card-text">{{ lecture.description }}</p>
-          {% endif %}
-        </div>
-        
-        <div class="card-footer">
-          <small class="text-muted">By: {{ lecture.staff.name }}</small>
-        </div>
-      </div>
+
+    <div class="chatbot-frame-container">
+        <iframe src="https://www.chatbase.co/chatbot-iframe/GYKwLx2jM7E4mQl6NlTGl" 
+                class="chatbot-frame" 
+                title="AI Learning Assistant">
+        </iframe>
     </div>
-    {% empty %}
-      <div class="col-12">
-        <button class="custom-btn" onclick="openPlaylist('https://youtube.com/playlist?list=PL7wwY6Ln64K4Ev1KQMNwudrh4YqtCTHf3&feature=shared')">
-          Python Lectures
-      </button>
-  
-      <button class="custom-btn" onclick="openPlaylist('https://www.youtube.com/playlist?list=PLulo_Xte7NLemxb_YvsbxMCuIkKzmA4de')">
-          MySQL Lectures
-      </button>
-  </div>
-  
-  <style>
-      .custom-btn {
-          width: 250px;
-          height: 80px;
-          font-size: 20px;
-          color: blue;
-          background-color: white;
-          border: 2px solid blue;
-          border-radius: 10px;
-          margin: 10px;
-          cursor: pointer;
-          font-weight: bold;
-          transition: 0.3s ease-in-out;
-      }
-  
-      /* Hover effect */
-      .custom-btn:hover {
-          background-color: blue;
-          color: white;
-          transform: scale(1.05);
-      }
-  </style>
-  
-  <script>
-      function openPlaylist(url) {
-          window.open(url, '_blank'); // Opens in a new tab
-      }
-  </script>
-      </div>
-    {% endfor %}
-  </div>
+
+    <div class="features-section">
+        <h3>What You Can Do</h3>
+        <ul class="feature-list">
+            <li>Ask questions about any subject or topic</li>
+            <li>Get detailed explanations and examples</li>
+            <li>Practice problems and receive instant feedback</li>
+            <li>Learn at your own pace</li>
+            <li>Available 24/7 for your learning needs</li>
+        </ul>
+    </div>
 </div>
-{% endblock %}
+
+{% endblock %}
