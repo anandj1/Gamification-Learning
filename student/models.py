@@ -3,10 +3,6 @@ from tkinter.tix import Tree
 from django.db import models
 from account.models import Profile
 from staff.models import Quiz, QuizQA, ClassRoomDiscussion, Staff, Attendance
-from django.db import models
-from account.models import Profile
-from staff.models import Quiz, QuizQA, ClassRoomDiscussion, Staff, Attendance
-from suadmin.models import Event
 
 # Create your models here.
 
@@ -37,9 +33,9 @@ class Coin(models.Model):
 
 
 class StudentQuiz(models.Model):
-    quiz = models.ForeignKey("staff.Quiz", on_delete=models.CASCADE)
-    student = models.ForeignKey("Student", on_delete=models.CASCADE)
-    profile = models.ForeignKey("account.Profile", on_delete=models.CASCADE)
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     status = models.BooleanField(default=False)
     score = models.FloatField(default=0)
     date_started = models.DateField(auto_now=True)
@@ -47,7 +43,6 @@ class StudentQuiz(models.Model):
     time_start = models.DateTimeField(null=True, blank=True)
     time_end = models.DateTimeField(null=True, blank=True)
     seconds = models.FloatField(null=True, blank=True)
-
 
     def __str__(self):
         return self.quiz.name
@@ -149,39 +144,6 @@ class BestPerfomer(models.Model):
 
     class Meta:
         db_table = 'best_perfomer'
-
-
-   
-class FlippedDiscussion(models.Model):
-    event = models.ForeignKey('suadmin.Event', on_delete=models.CASCADE)
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    student_profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
-    question = models.TextField()
-    date = models.DateTimeField(auto_now_add=True)
-    is_resolved = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f"{self.student.profile.name}: {self.question[:50]}"
-
-    class Meta:
-        db_table = 'flipped_discussions'
-        ordering = ['-date']  # Most recent first
-
-
-class FlippedReply(models.Model):
-    discussion = models.ForeignKey(FlippedDiscussion, on_delete=models.CASCADE, related_name='replies')
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    student_profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
-    content = models.TextField()
-    date = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Reply by {self.student.profile.name}: {self.content[:50]}"
-
-    class Meta:
-        db_table = 'flipped_replies'
-        ordering = ['date']  # Oldest first
-
 
 class Feedback(models.Model):
     staff_profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='staff_profile_feedback')

@@ -5,16 +5,6 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponseForbidden
 from django.urls import reverse
 from django.contrib import messages
-from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponseRedirect, HttpResponseForbidden
-from django.urls import reverse
-from django.contrib import messages
-from student.models import FlippedReply
-from suadmin.models import EventParticipants, Event
-from student.models import FlippedDiscussion
-from account.models import Profile
-from student.models import Student
-from student.models import Student, Coin, StudentQuiz, ExtraCirricular
 from django.db import IntegrityError
 from account.models import Profile, Roles
 from student.models import ExtraCirricular, Feedback, Flipped, Student, Coin, StudentAttendance, StudentCRDiscussion, StudentQuiz, StudentQuizQuestion
@@ -25,35 +15,26 @@ import datetime
 from django.utils import timezone
 
 # Create your views here.
-# In student/views.py
-from suadmin.models import EventParticipants
-
 def index(request):
     if request.session.has_key('account_id'):
-        if request.session['account_role'] == 3:
-            profile_id = int(request.session['account_id'])
+        if(request.session['account_role'] == 3):
             content = {}
             content['title'] = 'Welcome to Gamification Student Panel'
-            coins = Coin.objects.filter(profile_id=profile_id).first()
+            coins = Coin.objects.filter(profile_id = int(request.session['account_id'])).first()
             content['coins'] = coins
-            quiz_played = StudentQuiz.objects.filter(status=True, profile_id=profile_id).count()
+            quiz_played = StudentQuiz.objects.filter(status = True, profile_id = int(request.session['account_id'])).count()
             content['quiz_played'] = quiz_played
-            extra_cs = ExtraCirricular.objects.filter(student_profile_id=profile_id).count()
+            extra_cs = ExtraCirricular.objects.filter(student_profile_id = int(request.session['account_id'])).count()
             content['extra_cs'] = extra_cs
             most_coins = Coin.objects.order_by('-coin')
             content['most_coins'] = most_coins
-
-            # Fetch only the events the student is enrolled in
-            enrolled = EventParticipants.objects.filter(profile_id=profile_id).select_related('event')
-            enrolled_events = [ep.event for ep in enrolled]
-            content['enrolled_events'] = enrolled_events
-
             return render(request, 'student/index.html', content)
         else:
             return HttpResponseForbidden()
     else:
         messages.error(request, "Please login first.")
         return HttpResponseRedirect(reverse('account-login'))
+
 
 def quiz(request):
     if request.session.has_key('account_id'):
@@ -194,7 +175,7 @@ def submitQuiz(request, pk):
         return HttpResponseRedirect(reverse('account-login'))
 
 
-# def classRoomDiscussion(request):
+def classRoomDiscussion(request):
     if request.session.has_key('account_id'):
         if(request.session['account_role'] == 3):
             content = {}
@@ -207,7 +188,7 @@ def submitQuiz(request, pk):
         messages.error(request, "Please login first.")
         return HttpResponseRedirect(reverse('account-login'))
 
-# def flippedClassRoomDiscussion(request):
+def flippedClassRoomDiscussion(request):
     if request.session.has_key('account_id'):
         if(request.session['account_role'] == 3):
             content = {}
@@ -217,165 +198,6 @@ def submitQuiz(request, pk):
             return render(request, 'student/flippedclassroomdiscussion.html', content)
         else:
             return HttpResponseForbidden()
-    else:
-        messages.error(request, "Please login first.")
-        return HttpResponseRedirect(reverse('account-login'))
-
-# def flippedClassRoomDiscussion(request, event_id=None):
-    if request.session.has_key('account_id') and request.session['account_role'] == 3:
-        profile_id = int(request.session['account_id'])
-        
-        # Get all enrolled events for the student
-        enrolled = EventParticipants.objects.filter(
-            profile_id=profile_id
-        ).select_related('event')
-        
-        enrolled_events = [ep.event for ep in enrolled]
-        
-        if not enrolled_events:
-            messages.warning(request, "You are not enrolled in any events. Please enroll in an event first.")
-            return HttpResponseRedirect(reverse('std-event'))
-            
-        # If no event_id provided, use the first enrolled event
-        if event_id is None and enrolled_events:
-            event_id = enrolled_events[0].id
-        elif event_id is None:
-            messages.error(request, "No events found. Please enroll in an event first.")
-            return HttpResponseRedirect(reverse('std-event'))
-            
-        # Verify enrollment in selected event
-        if not enrolled.filter(event_id=event_id).exists():
-            messages.error(request, "You are not enrolled in this event.")
-            return HttpResponseRedirect(reverse('std-event'))
-            
-        # Get discussions for this event
-        discussions = FlippedDiscussion.objects.filter(
-            event_id=event_id
-        ).prefetch_related('replies').order_by('-date')
-        
-        context = {
-            'title': 'Flipped Classroom Discussion',
-            'event_id': event_id,
-            'discussions': discussions,
-            'enrolled_events': enrolled_events,
-        }
-        
-        return render(request, 'student/flippedclassroomdiscussion.html', context)
-    else:
-        messages.error(request, "Please login first.")
-        return HttpResponseRedirect(reverse('account-login'))
-
-def classRoomDiscussion(request):
-    if request.session.has_key('account_id'):
-        if(request.session['account_role'] == 3):
-            profile_id = int(request.session['account_id'])
-            content = {}
-            content['title'] = 'Classroom Discussions'
-            content['data'] = StudentCRDiscussion.objects.filter(profile_id=profile_id)
-            
-            # Add enrolled events to context
-            enrolled = EventParticipants.objects.filter(profile_id=profile_id).select_related('event')
-            content['enrolled_events'] = [ep.event for ep in enrolled]
-            
-            return render(request, 'student/classroomdiscussion.html', content)
-        else:
-            return HttpResponseForbidden()
-    else:
-        messages.error(request, "Please login first.")
-        return HttpResponseRedirect(reverse('account-login'))
-
-
-def flippedClassRoomDiscussion(request, event_id=None):
-    if request.session.has_key('account_id') and request.session['account_role'] == 3:
-        profile_id = int(request.session['account_id'])
-        
-        # Get all enrolled events for the student
-        enrolled = EventParticipants.objects.filter(
-            profile_id=profile_id
-        ).select_related('event')
-        
-        enrolled_events = [ep.event for ep in enrolled]
-        
-        if not enrolled_events:
-            messages.warning(request, "You are not enrolled in any events. Please enroll in an event first.")
-            return HttpResponseRedirect(reverse('std-event'))
-            
-        # If no event_id provided, use the first enrolled event
-        if event_id is None and enrolled_events:
-            event_id = enrolled_events[0].id
-        elif event_id is None:
-            messages.error(request, "No events found. Please enroll in an event first.")
-            return HttpResponseRedirect(reverse('std-event'))
-            
-        # Verify enrollment in selected event
-        if not enrolled.filter(event_id=event_id).exists():
-            messages.error(request, "You are not enrolled in this event.")
-            return HttpResponseRedirect(reverse('std-event'))
-            
-        # Get discussions for this event
-        discussions = FlippedDiscussion.objects.filter(
-            event_id=event_id
-        ).prefetch_related('replies').order_by('-date')
-        
-        context = {
-            'title': 'Flipped Classroom Discussion',
-            'event_id': event_id,
-            'discussions': discussions,
-            'enrolled_events': enrolled_events,
-        }
-        
-        return render(request, 'student/flippedclassroomdiscussion.html', context)
-    else:
-        messages.error(request, "Please login first.")
-        return HttpResponseRedirect(reverse('account-login'))
-
-def askFlippedQuestion(request, event_id):
-    if request.session.has_key('account_id') and request.session['account_role'] == 3:
-        profile_id = int(request.session['account_id'])
-        enrolled = EventParticipants.objects.filter(event_id=event_id, profile_id=profile_id).exists()
-        if not enrolled:
-            messages.error(request, "You are not enrolled in this event.")
-            return HttpResponseRedirect(reverse('std-event'))
-        if request.method == 'POST':
-            question_text = request.POST.get('question')
-            student = get_object_or_404(Student, profile_id=profile_id)
-            FlippedDiscussion.objects.create(
-                event_id=event_id,
-                student=student,
-                student_profile=student.profile,
-                question=question_text
-            )
-            messages.success(request, "Your question has been posted.")
-            return HttpResponseRedirect(reverse('std-flipped-classroom-discussion', kwargs={'event_id': event_id}))
-        else:
-            return render(request, 'student/ask_flipped_question.html', {'event_id': event_id})
-    else:
-        messages.error(request, "Please login first.")
-        return HttpResponseRedirect(reverse('account-login'))
-
-def replyFlippedQuestion(request, discussion_id):
-    if request.session.has_key('account_id') and request.session['account_role'] == 3:
-        discussion = get_object_or_404(FlippedDiscussion, pk=discussion_id)
-        event_id = discussion.event.id
-        profile_id = int(request.session['account_id'])
-        enrolled = EventParticipants.objects.filter(event_id=event_id, profile_id=profile_id).exists()
-        if not enrolled:
-            messages.error(request, "You are not enrolled in this event.")
-            return HttpResponseRedirect(reverse('std-event'))
-        if request.method == 'POST':
-            reply_text = request.POST.get('reply')
-            student = get_object_or_404(Student, profile_id=profile_id)
-            FlippedReply.objects.create(
-                discussion=discussion,
-                student=student,
-                student_profile=student.profile,
-                content=reply_text
-            )
-            messages.success(request, "Your reply has been posted.")
-            return HttpResponseRedirect(reverse('std-flipped-classroom-discussion', kwargs={'event_id': event_id}))
-        else:
-            context = {'discussion': discussion}
-            return render(request, 'student/reply_flipped_question.html', context)
     else:
         messages.error(request, "Please login first.")
         return HttpResponseRedirect(reverse('account-login'))

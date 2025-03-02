@@ -1,31 +1,13 @@
 from msilib.schema import Class
-from django.http import JsonResponse
+from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponseForbidden
-from django.views.decorators.csrf import csrf_protect
 from django.urls import reverse
 from django.contrib import messages
-from django.shortcuts import redirect
 from django.db import IntegrityError
-from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponseRedirect, HttpResponseForbidden
 from account.models import Profile, Roles
-from student.models import FlippedDiscussion
-from account.models import Profile, Roles
-from student.models import BestPerfomer, ExtraCirricular, Flipped, Student, Coin, StudentAttendance, StudentCRDiscussion,FlippedReply
+from student.models import BestPerfomer, ExtraCirricular, Flipped, Student, Coin, StudentAttendance, StudentCRDiscussion
 from staff.models import Attendance, ClassRoomDiscussion, Staff, Quiz, QuizQA
 from urllib.parse import urlparse, parse_qs
-from django.db import models
-from django.http import HttpResponseRedirect, HttpResponseForbidden
-from django.urls import reverse
-from django.contrib import messages
-from suadmin.models import Event
-from student.models import FlippedDiscussion
-import logging
-from suadmin.models import Event
-from django.urls import reverse
-from django.contrib import messages
-from suadmin.models import Event  # ensure you import Event
-from student.models import FlippedDiscussion
 
 # Create your views here.
 
@@ -468,28 +450,24 @@ def extraCirricular(request):
         messages.error(request, "Please login first.")
         return HttpResponseRedirect(reverse('account-login'))
 
-
 def flipped(request):
     if request.session.has_key('account_id'):
-        if request.session['account_role'] == 2:
+        if(request.session['account_role'] == 2):
             content = {}
             content['title'] = 'Flipped Classroom Discussions'
             content['fl_title'] = ''
             content['stds'] = Student.objects.all()
-            # Prefetch replies so that each flipped discussion includes its replies.
-            content['discussions'] = Flipped.objects.filter(
-                staff_profile_id=int(request.session['account_id'])
-            ).prefetch_related('replies')
+            content['discussions'] = Flipped.objects.filter(staff_profile_id = int(request.session['account_id']))
             if request.method == 'POST':
-                getstaff = Staff.objects.filter(profile_id=int(request.session['account_id'])).first()
-                getstd = Student.objects.filter(profile_id=int(request.POST['student'])).first()
+                getstaff = Staff.objects.filter(profile_id = int(request.session['account_id'])).first()
+                getstd = Student.objects.filter(profile_id = int(request.POST['student'])).first()
 
                 flip = Flipped()
                 flip.name = request.POST['name'].title()
-                flip.staff_profile = Profile.objects.get(pk=int(request.session['account_id']))
-                flip.student_profile = Profile.objects.get(pk=int(request.POST['student']))
-                flip.staff = Staff.objects.get(pk=getstaff.id)
-                flip.student = Student.objects.get(pk=getstd.id)
+                flip.staff_profile = Profile.objects.get(pk = int(request.session['account_id']))
+                flip.student_profile = Profile.objects.get(pk = int(request.POST['student']))
+                flip.staff = Staff.objects.get(pk = getstaff.id)
+                flip.student = Student.objects.get(pk = getstd.id)
                 flip.coin = int(request.POST['coin'])
                 flip.badge = request.POST['badge']
                 flip.save()
@@ -499,17 +477,15 @@ def flipped(request):
                 std.coin = std_coins + int(request.POST['coin'])
                 std.save()
                 messages.success(request, 'Flipped discussion added for selected student')
-                # Re-fetch with replies
-                content['discussions'] = Flipped.objects.filter(
-                    staff_profile_id=int(request.session['account_id'])
-                ).prefetch_related('replies')
+                content['discussions'] = Flipped.objects.filter(staff_profile_id = int(request.session['account_id']))
+                # return HttpResponseRedirect(reverse('st-flipped'))
+                
             return render(request, 'staff/flipped/flipped.html', content)
         else:
             return HttpResponseForbidden()
     else:
         messages.error(request, "Please login first.")
         return HttpResponseRedirect(reverse('account-login'))
-
 
 def bestPerformer(request):
     if request.session.has_key('account_id'):
@@ -537,64 +513,3 @@ def bestPerformer(request):
     else:
         messages.error(request, "Please login first.")
         return HttpResponseRedirect(reverse('account-login'))
-
-# In staff/views.py
-
-logger = logging.getLogger(__name__)
-
-
-def flippedDiscussionOverview(request):
-    if request.session.has_key('account_id') and request.session['account_role'] == 2:
-        try:
-            # Get all events
-            events = Event.objects.all()
-            event_id = request.GET.get('event_id')
-
-            # Base query with all related data
-            discussions_query = FlippedDiscussion.objects.select_related(
-                'event', 'student', 'student__profile'
-            ).prefetch_related(
-                'replies', 'replies__student', 'replies__student__profile'
-            ).order_by('-date')
-
-            # Filter by event if specified
-            if event_id:
-                try:
-                    event_id = int(event_id)
-                    discussions = discussions_query.filter(event_id=event_id)
-                except (ValueError, TypeError):
-                    discussions = discussions_query
-            else:
-                discussions = discussions_query
-
-            context = {
-                'title': 'Flipped Classroom Discussions Overview',
-                'discussions': discussions,
-                'events': events,
-                'selected_event': event_id,
-                'has_events': events.exists(),
-            }
-
-            return render(request, 'staff/flipped/flipped.html', context)
-
-        except Exception as e:
-            logger.error(f"Error in flippedDiscussionOverview: {str(e)}")
-            messages.error(request, "An error occurred while loading discussions")
-            return HttpResponseRedirect(reverse('st-index'))
-    
-    messages.error(request, "Please login first.")
-    return HttpResponseRedirect(reverse('account-login'))
-
-def resolveDiscussion(request, pk):
-    if request.session.has_key('account_id') and request.session['account_role'] == 2:
-        if request.method == 'POST':
-            try:
-                discussion = get_object_or_404(FlippedDiscussion, pk=pk)
-                discussion.is_resolved = True
-                discussion.save()
-                logger.info(f"Discussion {pk} marked as resolved successfully.")
-                return JsonResponse({'success': True})
-            except Exception as e:
-                logger.error(f"Error resolving discussion {pk}: {str(e)}")
-                return JsonResponse({'success': False, 'error': str(e)})
-    return JsonResponse({'success': False, 'error': 'Unauthorized request'})
