@@ -1,14 +1,11 @@
-from statistics import mode
-from typing import Optional
 from django.db import models
 from account.models import Profile
+from suadmin.models import Event
 
 # Create your models here.
-
-
 class Staff(models.Model):
-    email = models.CharField(max_length=255,unique=True,null=True)
-    contact = models.CharField(max_length=255,unique=True,null=True)
+    email = models.CharField(max_length=255, unique=True, null=True)
+    contact = models.CharField(max_length=255, unique=True, null=True)
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -32,6 +29,7 @@ class Quiz(models.Model):
     class Meta:
         db_table = 'quiz'
 
+
 class QuizQA(models.Model):
     question = models.CharField(max_length=255)
     option_1 = models.CharField(max_length=255)
@@ -47,6 +45,7 @@ class QuizQA(models.Model):
     class Meta:
         db_table = 'quiz_qas'
 
+
 class ClassRoomDiscussion(models.Model):
     name = models.CharField(max_length=255)
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
@@ -59,6 +58,7 @@ class ClassRoomDiscussion(models.Model):
     class Meta:
         db_table = 'classroom_discussion'
 
+
 class Attendance(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
@@ -66,7 +66,10 @@ class Attendance(models.Model):
     date = models.DateField(auto_now=True)
 
     def __str__(self):
-        return self.name
+        return f"{self.profile.name} - {self.date}"
 
     class Meta:
         db_table = 'attendance_model'
+
+
+  

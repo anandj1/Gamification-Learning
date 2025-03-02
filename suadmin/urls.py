@@ -9,4 +9,6 @@ urlpatterns = [
     path('event-participants/<int:pk>', views.eventParti, name='su-event-parti'),
     path('feedback', views.feedback, name='su-feedback'),
     path('train', views.train, name='su-train'),
+   
+
 ]

@@ -1,0 +1,27 @@
+{% extends 'layouts/staff.html' %}
+{% load static %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2 class="text-primary">{{ title }}</h2>
+    </div>
+</div>
+
+<div class="row mt-5 mb-5">
+    <div class="col-md-12">
+        <h4 class="alert alert-info">You've the rating of {{ rating.rating }}</h4>
+    </div>
+    <div class="col-md-6">
+        <h1>Boost student engagement with real-time, classroom quiz</h1>
+        <p class="lead pt-2 ">
+            {{ PROJECT_NAME }}  makes it easy to get students excited about formative assessment. Create custom quizzes and track your class's progress with just a few clicks.
+        </p>
+        <p class="text-info lead fw-bold">
+            You as a staff create exiting quiz for students, give them coins credit for the attendance & other activities. Help your students to explore much.
+        </p>
+    </div>
+    <div class="col-md-6">
+        <img src="{% static 'images/bg/02.jpg' %}" alt="image" class="img-fluid">
+    </div>
+</div>
+{% endblock %}
