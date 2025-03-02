@@ -1,183 +1,75 @@
-{% extends 'staff/base.html' %}
+{% extends 'layouts/staff.html' %}
 {% load static %}
-
 {% block content %}
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">{{ title }}</h3>
-                </div>
-                <div class="card-body">
-                    <!-- Event Filter -->
-                    <div class="mb-4">
-                        <form method="get" class="form-inline">
-                            <div class="form-group">
-                                <label for="event_id" class="mr-2">Filter by Event:</label>
-                                <select name="event_id" id="event_id" class="form-control mr-2" onchange="this.form.submit()">
-                                    <option value="">All Events</option>
-                                    {% for event in events %}
-                                    <option value="{{ event.id }}" {% if selected_event == event.id %}selected{% endif %}>
-                                        {{ event.title }}
-                                    </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </form>
-                    </div>
-
-                    {% if has_events %}
-                        {% if discussions %}
-                            <!-- Discussions List -->
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>Event</th>
-                                            <th>Student</th>
-                                            <th>Question</th>
-                                           
-                                            <th>Date</th>
-                                            <th>Status</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for discussion in discussions %}
-                                        <tr id="discussion-row-{{ discussion.id }}">
-                                            <td>{{ discussion.event.title }}</td>
-                                            <td>{{ discussion.student.profile.name }}</td>
-                                            <td>{{ discussion.question }}</td>
-                                           
-                                            <td>{{ discussion.date|date:"M d, Y H:i" }}</td>
-
-                                            <td>
-                                                <span class="badge {% if discussion.is_resolved %}bg-success{% else %}bg-warning{% endif %}">
-                                                    {{ discussion.is_resolved|yesno:"Resolved,Pending" }}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <a href="#" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#viewDiscussion{{ discussion.id }}">
-                                                    View Details
-                                                </a>
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <!-- Discussion Modals -->
-                            {% for discussion in discussions %}
-                            <div class="modal fade" id="viewDiscussion{{ discussion.id }}" tabindex="-1" aria-labelledby="viewDiscussionLabel{{ discussion.id }}" aria-hidden="true">
-                                <div class="modal-dialog modal-lg">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="viewDiscussionLabel{{ discussion.id }}">Discussion Details</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <h6>Question:</h6>
-                                            <p>{{ discussion.question }}</p>
-                                            
-                                            <h6>Replies:</h6>
-                                            {% if discussion.replies.all %}
-                                                {% for reply in discussion.replies.all %}
-                                                <div class="card mb-2">
-                                                    <div class="card-body">
-                                                        <p class="mb-1">{{ reply.content }}</p>
-                                                        <small class="text-muted">
-                                                            By {{ reply.student.profile.name }} on {{ reply.date|date:"M d, Y H:i" }}
-                                                        </small>
-                                                    </div>
-                                                </div>
-                                                {% endfor %}
-                                            {% else %}
-                                                <p class="text-muted">No replies yet.</p>
-                                            {% endif %}
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                            {% if not discussion.is_resolved %}
-                                            <form method="post" action="{% url 'resolve-discussion' discussion.id %}" class="resolve-form" data-discussion-id="{{ discussion.id }}">
-                                                {% csrf_token %}
-                                                <button type="submit" class="btn btn-success">Mark as Resolved</button>
-                                            </form>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        {% else %}
-                            <div class="alert alert-info">
-                                No discussions found for the selected criteria.
-                            </div>
-                        {% endif %}
-                    {% else %}
-                        <div class="alert alert-warning">
-                            No events have been created yet. Please create an event first.
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
+<div class="row">
+    <div class="col-md-12">
+        <h2 class="text-primary">{{ title }}</h2>
     </div>
 </div>
 
-<!-- Add Bootstrap JS and its dependencies -->
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
+<div class="row my-3">
+    <div class="col-md-12">
+        <h4>New discussion</h4>
+        <form action="{% url 'st-flipped' %}" method="post" class="row">
+            {% csrf_token %}
+            <div class="form-group col-md-5 mb-3">
+                <label for="name">Title</label>
+                <input type="text" name="name" required placeholder="Title for the discussion" value="{{ fl_title }}" id="name" class="form-control">
+            </div>
+            <div class="form-group col-md-3 mb-3">
+                <label for="student">Student</label>
+                <select name="student" id="student" class="form-control" required>
+                    <option value="">Select</option>
+                    {% for i in stds %}
+                    <option value="{{ i.profile_id }}">{{ i.profile.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group col-md-2 mb-3 d-none">
+                <label for="coin">Coin</label>
+                <input type="number" name="coin" required placeholder="Coins" id="coin" value="0" class="form-control">
+            </div>
+            <div class="form-group col-md-2 mb-3">
+                <label for="badge">Badge</label>
+                <select name="badge" id="badge" class="form-control" required>
+                    <option value="">Select</option>
+                    <option value="Creative Idea">Creative Idea</option>
+                    <option value="Punctual Student">Punctual Student</option>
+                    <option value="Best Presentor">Best Presentor</option>
+                </select>
+            </div>
+            <div class="form-group col-md-2 mb-3">
+                <button type="submit" class="btn btn-primary"><i class="bx bx-save"></i> Save</button>
+            </div>
+        </form>
+    </div>
+</div>
 
-<!-- ✅ FIX: Ensure modal closes correctly and black screen issue is resolved -->
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.resolve-form').forEach(form => {
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                const discussionId = this.dataset.discussionId;
-                const formData = new FormData(this);
-    
-                fetch(this.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRFToken': formData.get('csrfmiddlewaretoken')
-                    }
-                })
-                .then(response => response.json())  // ✅ Ensure response is JSON
-                .then(data => {
-                    if (data.success) {
-                        const modalElement = document.querySelector(`#viewDiscussion${discussionId}`);
-                        const modal = bootstrap.Modal.getInstance(modalElement);
-                        if (modal) modal.hide();
-    
-                        document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
-    
-                        const statusCell = document.querySelector(`#discussion-row-${discussionId} td:nth-child(5)`);
-                        statusCell.innerHTML = '<span class="badge bg-success">Resolved</span>';
-    
-                        this.remove();
-                    } else {
-                        alert('Failed to mark discussion as resolved. Please try again.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred.');
-                });
-            });
-        });
-    });
-    </script>
-    
-
-<!-- ✅ CSS Fix: Ensure any leftover modal backdrop does not cause a black screen -->
-<style>
-.modal-backdrop {
-    display: none !important;
-}
-</style>
-
+<div class="row my-3">
+    <div class="col-md-12">
+        <h4>Discussion details</h4>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Student</th>
+                        <th>Badge</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for x in discussions %}
+                    <tr>
+                        <td>{{ x.name }}</td>
+                        <td>{{ x.student_profile.name }}</td>
+                        <td>{{ x.badge }}</td>
+                        <td>{{ x.date }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 {% endblock %}
