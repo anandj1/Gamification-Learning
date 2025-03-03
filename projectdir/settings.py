@@ -71,7 +71,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'gamification',  # Replace with your database name
         'USER': 'root',          # Replace with your database user
-        'PASSWORD': 'Radhey9922',  # Replace with your database password
+        'PASSWORD': 'kunal',  # Replace with your database password
         'HOST': '127.0.0.1',     # Use only one host value
         'PORT': 3306,            # Replace with your database port if different
         'OPTIONS': {

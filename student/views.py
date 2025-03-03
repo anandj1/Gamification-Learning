@@ -555,6 +555,7 @@ def python_lecture(request):
         return HttpResponseRedirect(reverse('account-login'))
 
 def sql_lecture(request):
+<<<<<<< Updated upstream
     if request.session.has_key('account_id') and request.session['account_role'] == 3:
         profile_id = int(request.session['account_id'])
         enrolled_events = get_enrolled_events(profile_id)
@@ -582,3 +583,9 @@ def sql_lecture(request):
     else:
         messages.error(request, "Please login first.")
         return HttpResponseRedirect(reverse('account-login'))
+=======
+    return render(request, 'student/sql_lecture.html', {'title': 'SQL Lecture'})
+
+def web_lecture(request):
+    return render(request, 'student/web_lecture.html', {'title': 'WEB Development Lecture'})
+>>>>>>> Stashed changes

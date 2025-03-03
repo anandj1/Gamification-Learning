@@ -20,4 +20,5 @@ urlpatterns = [
     path('lecture', views.lecture, name='std-lecture'),
     path('student/python-lecture/', views.python_lecture, name='python-lecture'),
     path('student/sql-lecture/', views.sql_lecture, name='sql-lecture'),
+    path('student/web-lecture/', views.web_lecture, name='web-lecture'),
 ]
