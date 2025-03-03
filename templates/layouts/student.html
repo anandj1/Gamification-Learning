@@ -48,7 +48,9 @@
                                         Flipped Classroom
                                     </a>
                                 {% else %}
-                                    <a class="dropdown-item" href="{% url 'std-event' %}">Enroll in Events</a>
+                                    <a class="dropdown-item" href="{% url 'std-event' %}">
+                                        Flipped Classroom (Enroll First)
+                                    </a>
                                 {% endif %}
                             </li>
                         </ul>
@@ -70,7 +72,8 @@
                            href="{% url 'std-event' %}">Event</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" aria-current="page" href="{% url 'std-lecture' %}">Lectures</a>
+                        <a class="nav-link {% if request.resolver_match.url_name == 'std-lecture' %}active{% endif %}" 
+                           href="{% url 'std-lecture' %}">Lectures</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.resolver_match.url_name == 'std-feedback' %}active{% endif %}" 

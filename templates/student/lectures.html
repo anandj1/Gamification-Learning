@@ -1,17 +1,59 @@
 {% extends 'layouts/student.html' %}
 {% load static %}
 {% block content %}
-<div class="row">
-    <div class="col-md-12">
-        <h2 class="text-primary">{{ title }}</h2>
-    </div>
+<style>
+    .lecture-card {
+        transition: transform 0.3s ease-in-out;
+    }
+    .lecture-card:hover {
+        transform: scale(1.05);
+    }
+    .btn-custom {
+        border-radius: 25px;
+    }
+</style>
 
-    <div class="col-md-6">
-        <a href="{% url 'python-lecture' %}" target="_blank" class="btn btn-primary btn-lg mt-3">Python Lecture</a>
-    </div>
-
-    <div class="col-md-6">
-        <a href="{% url 'sql-lecture' %}" target="_blank" class="btn btn-success btn-lg mt-3">SQL Lecture</a>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12 text-center mb-4">
+            <h2 class="text-primary">{{ title }}</h2>
+        </div>
+    
+        {% if enrolled_events %}
+            <div class="col-md-12 mb-4">
+                <div class="alert alert-info text-center shadow-sm">
+                    <h5> Available Lectures</h5>
+                    <p>Access lectures for the events you've enrolled in below.</p>
+                </div>
+            </div>
+    
+            {% for event in enrolled_events %}
+                <div class="col-md-6 mb-4">
+                    <div class="card lecture-card shadow-lg">
+                        <div class="card-header bg-primary text-white text-center">
+                            <h5>{{ event.title }}</h5>
+                        </div>
+                        <div class="card-body text-center">
+                            <p>{{ event.description|truncatechars:100 }}</p>
+                            {% if "Python" in event.title or "python" in event.title %}
+                                <a href="{% url 'python-lecture' %}" class="btn btn-success btn-custom">🐍 View Python Lectures</a>
+                            {% elif "SQL" in event.title or "sql" in event.title %}
+                                <a href="{% url 'sql-lecture' %}" class="btn btn-info btn-custom">💾 View SQL Lectures</a>
+                            {% else %}
+                                <p class="text-muted">No specific lectures available for this event.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-md-12 text-center">
+                <div class="alert alert-warning shadow-sm">
+                    <h4> No Enrolled Events</h4>
+                    <p>Enroll in events to access lectures. Visit the <a href="{% url 'std-event' %}" class="text-primary font-weight-bold">Events Page</a>.</p>
+                </div>
+            </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

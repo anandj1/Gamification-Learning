@@ -69,7 +69,7 @@
                                             <h6 class="text-muted">Replies:</h6>
                                             {% for reply in discussion.replies.all %}
                                                 <div class="border rounded p-2 mb-2 bg-light">
-                                                    <strong class="text-success">{{ reply.student.profile.name }}</strong>: {{ reply.reply }}
+                                                    <strong class="text-success">{{ reply.student.profile.name }}</strong>: {{ reply.content }}
                                                     <small class="text-muted d-block">{{ reply.date|date:"Y-m-d H:i" }}</small>
                                                 </div>
                                             {% endfor %}
