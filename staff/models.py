@@ -22,6 +22,8 @@ class Quiz(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
     date = models.DateField(auto_now_add=True)
+    generated_by_ai = models.BooleanField(default=False)
+    ai_generation_prompt = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.name

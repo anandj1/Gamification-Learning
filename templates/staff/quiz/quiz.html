@@ -19,11 +19,39 @@
                         <input type="text" name="name" placeholder="Enter name" autocomplete="off" required id="name" class="form-control" required>
                     </div>
                     <div class="form-group mb-3">
+                        <label for="number">Number of Questions</label>
+                        <input type="number" name="number" placeholder="Points each question carry" autocomplete="off" required id="number" class="form-control" required>
+                    </div>
+                    <div class="form-group mb-3">
                         <label for="each_point">Each Question Point</label>
                         <input type="number" name="each_point" placeholder="Points each question carry" autocomplete="off" required id="each_point" class="form-control" required>
                     </div>
+
+                    <div class="form-group mb-3 ">
+                        <button type="submit" class="btn btn-success"><i class="bx bx-save"></i> Add</button>
+                    </div>
+                </form>
+
+                <hr>
+
+                <h4>Generate AI Quiz</h4>
+                <form action="{% url 'st-quiz' %}" method="post">
+                    {% csrf_token %}
                     <div class="form-group mb-3">
-                        <button type="submit" class="btn btn-primary"><i class="bx bx-save"></i> Add</button>
+                        <label for="ai_topic">Quiz Topic</label>
+                        <input type="text" name="ai_topic" placeholder="Enter quiz topic" autocomplete="off" required id="ai_topic" class="form-control" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="ai_num_questions">Number of Questions</label>
+                        <input type="number" name="ai_num_questions" placeholder="Number of questions" autocomplete="off" required id="ai_num_questions" class="form-control" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="each_point_ai">Each Question Point</label>
+                        <input type="number" name="each_point_ai" placeholder="Points each question carry" autocomplete="off" required id="each_point_ai" class="form-control" required>
+                    </div>
+
+                    <div class="form-group mb-3 ">
+                        <button type="submit" name="ai_generate" class="btn btn-info"><i class="bx bx-magic-wand"></i> Generate with AI</button>
                     </div>
                 </form>
             </div>

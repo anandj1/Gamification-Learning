@@ -23,7 +23,12 @@ from urllib.parse import urlparse, parse_qs
 from datetime import date, datetime
 import datetime
 from django.utils import timezone
+import google.generativeai as genai
+import os
 
+
+genai.configure(api_key=os.environ.get("GEMINI_API_KEY")) # Replace with your API key
+model = genai.GenerativeModel('gemini-1.5-flash')
 # Create your views here.
 # In student/views.py
 from suadmin.models import EventParticipants
@@ -71,13 +76,13 @@ def quiz(request):
 
 def playQuiz(request, pk):
     if request.session.has_key('account_id'):
-        if(request.session['account_role'] == 3):
+        if request.session['account_role'] == 3:
             content = {}
-            quiz = Quiz.objects.get(pk = pk)
-            content['quiz'] = quiz  
+            quiz = Quiz.objects.get(pk=pk)
+            content['quiz'] = quiz
 
             # Check quiz record
-            student_quiz = StudentQuiz.objects.filter(quiz_id = pk, profile_id = int(request.session['account_id'])).first()
+            student_quiz = StudentQuiz.objects.filter(quiz_id=pk, profile_id=int(request.session['account_id'])).first()
             if student_quiz:
                 print('Data already exists')
             else:
@@ -89,52 +94,71 @@ def playQuiz(request, pk):
                 std_quiz.profile = Profile.objects.get(pk=int(request.session['account_id']))
                 std_quiz.time_start = current_time
                 std_quiz.save()
-            
+
             # Get question ids in an array list
-            question_data = QuizQA.objects.filter(quiz_id = pk)
+            question_data = QuizQA.objects.filter(quiz_id=pk)
             questions_array = []
             for x in question_data:
                 questions_array.append(x.id)
 
             # Loop through questions
             content['question'] = ''
-            questions_array_final = questions_array.copy()      # tooked one and half days to figure out the problem. Just haven't placed .copy()
+            questions_array_final = questions_array.copy()
             for x in questions_array:
-                check_pre_question = StudentQuizQuestion.objects.filter(question_id = x, quiz_id = pk, profile_id = int(request.session['account_id'])).last()
+                check_pre_question = StudentQuizQuestion.objects.filter(question_id=x, quiz_id=pk, profile_id=int(request.session['account_id'])).last()
                 if check_pre_question:
                     questions_array_final.remove(x)
                 else:
                     continue
 
-            # content['que_arrays'] = questions_array
-            # content['que_arrays_final'] = questions_array_final
-
-            qa = None     
+            qa = None
             if len(questions_array_final) > 0:
-                qa = QuizQA.objects.get(pk = questions_array_final[0])
+                qa = QuizQA.objects.get(pk=questions_array_final[0])
                 content['question'] = qa
             else:
                 content['question'] = None
-            
+
             # Display question name as title
             content['title'] = quiz.name
 
             # Post the data
             if request.method == 'POST':
-                qa_option = request.POST['qa_option']
-                add_quiz_data = StudentQuizQuestion()
-                add_quiz_data.quiz = Quiz.objects.get(pk=pk)
-                add_quiz_data.student = Student.objects.get(pk=int(request.session['student_id']))
-                add_quiz_data.profile = Profile.objects.get(pk=int(request.session['account_id']))
-                add_quiz_data.question = QuizQA.objects.get(pk=qa.id)
-                if qa_option == qa.right_option:
-                    add_quiz_data.is_right = True
-                    add_quiz_data.coins = quiz.each_point
+                if 'qa_option' in request.POST: # Check if qa_option exists.
+                    qa_option = request.POST['qa_option']
+                    add_quiz_data = StudentQuizQuestion()
+                    add_quiz_data.quiz = Quiz.objects.get(pk=pk)
+                    add_quiz_data.student = Student.objects.get(pk=int(request.session['student_id']))
+                    add_quiz_data.profile = Profile.objects.get(pk=int(request.session['account_id']))
+                    add_quiz_data.question = QuizQA.objects.get(pk=qa.id)
+                    if qa_option == qa.right_option:
+                        add_quiz_data.is_right = True
+                        add_quiz_data.coins = quiz.each_point
+                        content['explanation'] = None #clear any previous explanation.
+                    else:
+                        add_quiz_data.is_right = False
+                        add_quiz_data.coins = 0
+                        # Explanation using Gemini API
+                        try:
+                            explanation_prompt = f"""
+                            Explain the following question and answer in detail:
+                            Question: {qa.question}
+                            Correct Answer: {qa.right_option}
+                            Selected Answer: {qa_option}
+                            Explain why the correct answer is correct, and specifically explain why the selected answer is incorrect in a way that the student can understand. Give me the answer in short about 5 lines.
+                            """
+                            explanation_response = model.generate_content(explanation_prompt)
+                            content['explanation'] = explanation_response.text
+                        except Exception as e:
+                            content['explanation'] = f"Could not generate explanation: {e}"
+
+                    add_quiz_data.save()
+                    return render(request, 'student/quiz/play-quiz.html', content) #re-render the page to show the explanation
                 else:
-                    add_quiz_data.is_right = False
-                    add_quiz_data.coins = 0
-                add_quiz_data.save()
-                return HttpResponseRedirect(reverse('std-play-quiz', kwargs={'pk': pk}))
+                    print("Error: 'qa_option' not found in POST data.")
+                    print(request.POST) #print the post data.
+                    messages.error(request, "Please select an answer.")
+                    return render(request, 'student/quiz/play-quiz.html', content)
+
             return render(request, 'student/quiz/play-quiz.html', content)
         else:
             return HttpResponseForbidden()
@@ -145,23 +169,24 @@ def playQuiz(request, pk):
 
 def submitQuiz(request, pk):
     if request.session.has_key('account_id'):
-        if(request.session['account_role'] == 3):
+        if request.session['account_role'] == 3:
             if request.method == 'POST':
                 quiz = Quiz.objects.get(pk=pk)
-                student_quiz = StudentQuiz.objects.filter(quiz_id = pk, profile_id = int(request.session['account_id'])).first()
+                student_quiz = StudentQuiz.objects.filter(quiz_id=pk, profile_id=int(request.session['account_id'])).first()
+
                 # End time
-                end_time = datetime.datetime.now(timezone.utc)
+                end_time = datetime.datetime.now(datetime.timezone.utc)
 
                 # Get difference in seconds
                 difference = (end_time - student_quiz.time_start)
                 total_seconds = difference.total_seconds()
-                student_quiz_questions = StudentQuizQuestion.objects.filter(quiz_id = pk, profile_id = int(request.session['account_id']))
+                student_quiz_questions = StudentQuizQuestion.objects.filter(quiz_id=pk, profile_id=int(request.session['account_id']))
 
                 # Collect coins
                 coins = 0
                 for x in student_quiz_questions:
                     coins = coins + x.coins
-                
+
                 # Save data
                 student_quiz.score = coins
                 student_quiz.status = True
@@ -171,28 +196,47 @@ def submitQuiz(request, pk):
                 student_quiz.save()
 
                 # Student coins
-                std = Coin.objects.filter(profile_id = int(request.session['account_id'])).first()
+                std = Coin.objects.filter(profile_id=int(request.session['account_id'])).first()
                 std_coins = std.coin
                 std.coin = std_coins + coins
                 std.save()
 
-                get_all_list = StudentQuiz.objects.filter(quiz_id = pk).order_by('-score', 'seconds')[:5]
+                get_all_list = StudentQuiz.objects.filter(quiz_id=pk).order_by('-score', 'seconds')[:5]
                 for x in get_all_list:
-                    single_quiz = StudentQuiz.objects.filter(quiz_id = pk, profile_id = int(request.session['account_id'])).first()
+                    single_quiz = StudentQuiz.objects.filter(quiz_id=pk, profile_id=int(request.session['account_id'])).first()
                     if x.profile_id == single_quiz.profile_id:
-                        std = Coin.objects.filter(profile_id = int(request.session['account_id'])).first()
+                        std = Coin.objects.filter(profile_id=int(request.session['account_id'])).first()
                         std_coins = std.coin
                         std.coin = std_coins + (coins * 2)
                         std.save()
 
                 messages.success(request, 'You have successfully completed the quiz.')
-                return HttpResponseRedirect(reverse('std-quiz'))
+
+                # Add retest option
+                return HttpResponseRedirect(reverse('std-quiz-retest', kwargs={'pk': pk})) #Redirect to retest function.
+            else:
+                return HttpResponseForbidden()
         else:
             return HttpResponseForbidden()
     else:
         messages.error(request, "Please login first.")
         return HttpResponseRedirect(reverse('account-login'))
 
+def retestQuiz(request, pk):
+    if request.session.has_key('account_id'):
+        if request.session['account_role'] == 3:
+            # Delete previous attempts
+            StudentQuiz.objects.filter(quiz_id=pk, profile_id=int(request.session['account_id'])).delete()
+            StudentQuizQuestion.objects.filter(quiz_id=pk, profile_id=int(request.session['account_id'])).delete()
+
+            messages.success(request, 'You can now retest the quiz.')
+            return HttpResponseRedirect(reverse('std-play-quiz', kwargs={'pk': pk})) #Redirect to play quiz
+
+        else:
+            return HttpResponseForbidden()
+    else:
+        messages.error(request, "Please login first.")
+        return HttpResponseRedirect(reverse('account-login'))
 
 # def classRoomDiscussion(request):
     if request.session.has_key('account_id'):

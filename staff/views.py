@@ -12,6 +12,7 @@ from account.models import Profile, Roles
 from student.models import FlippedDiscussion
 from account.models import Profile, Roles
 from student.models import BestPerfomer, ExtraCirricular, Flipped, Student, Coin, StudentAttendance, StudentCRDiscussion,FlippedReply
+import logging
 from staff.models import Attendance, ClassRoomDiscussion, Staff, Quiz, QuizQA
 from urllib.parse import urlparse, parse_qs
 from django.db import models
@@ -26,9 +27,10 @@ from django.urls import reverse
 from django.contrib import messages
 from suadmin.models import Event  # ensure you import Event
 from student.models import FlippedDiscussion
+from .ai_quiz_generator import create_quiz_gemini
 
 # Create your views here.
-
+logger = logging.getLogger(__name__)
 
 def index(request):
     if request.session.has_key('account_id'):
@@ -100,34 +102,85 @@ def student(request):
 
 def quiz(request):
     if request.session.has_key('account_id'):
-        if(request.session['account_role'] == 2):
+        if request.session['account_role'] == 2:
             content = {}
             content['title'] = 'Quiz by you'
-            quizes = Quiz.objects.filter(profile_id = int(request.session['account_id']))
+            quizes = Quiz.objects.filter(profile_id=int(request.session['account_id']))
             for x in quizes:
                 qas = QuizQA.objects.filter(quiz_id=x.id).count()
                 update_quiz = Quiz.objects.get(pk=int(x.id))
                 total = update_quiz.each_point * qas
                 update_quiz.total = total
                 update_quiz.save()
-            quizes = Quiz.objects.filter(profile_id = int(request.session['account_id']))
+            quizes = Quiz.objects.filter(profile_id=int(request.session['account_id']))
             content['quizs'] = quizes
-            
+
             if request.method == 'POST':
-                name = request.POST['name']
-                point = int(request.POST['each_point'])
+                if 'ai_generate' in request.POST:
+                    topic = request.POST['ai_topic']
+                    num_questions = int(request.POST['ai_num_questions'])
+                    point = int(request.POST['each_point_ai'])
 
-                getstaff = Staff.objects.filter(profile_id = int(request.session['account_id'])).first()
+                    getstaff = Staff.objects.filter(profile_id=int(request.session['account_id'])).first()
 
-                quiz = Quiz()
-                quiz.name = name.title()
-                quiz.each_point = point
-                quiz.profile = Profile.objects.get(pk = int(request.session['account_id']))
-                quiz.staff = Staff.objects.get(pk = int(getstaff.id))
-                quiz.save()
-                messages.success(request, f'{name.title()} added to your quiz list.')
-                quizes = Quiz.objects.filter(profile_id = int(request.session['account_id']))
+                    questions = create_quiz_gemini(topic, num_questions)
+
+                    if isinstance(questions, str):
+                        messages.error(request, questions)
+                        return render(request, 'staff/quiz/quiz.html', content)
+
+                    quiz = Quiz.objects.create(
+                        name=f"AI Quiz: {topic}",
+                        each_point=point,
+                        profile=Profile.objects.get(pk=int(request.session['account_id'])),
+                        staff=Staff.objects.get(pk=int(getstaff.id)),
+                        generated_by_ai=True,
+                        ai_generation_prompt=f"Topic: {topic}, Questions: {num_questions}"
+                    )
+
+                    for q_data in questions:
+                        if q_data.get('options') and len(q_data['options']) >= 4:  # Check if options exist and have 4 elements
+                            QuizQA.objects.create(
+                                quiz=quiz,
+                                question=q_data['question'],
+                                option_1=q_data['options'][0],
+                                option_2=q_data['options'][1],
+                                option_3=q_data['options'][2],
+                                option_4=q_data['options'][3],
+                                right_option=q_data['correct_answer']
+                            )
+                        else:
+                            logger.error(f"Skipping question due to empty or insufficient options: {q_data}") #log error
+                            messages.error(request, f"Skipped a question due to missing options.") #alert user
+                            #Optionally, create a default question with default options.
+                            # QuizQA.objects.create(
+                            #   quiz=quiz,
+                            #   question=q_data['question'],
+                            #   option_1="Option A",
+                            #   option_2="Option B",
+                            #   option_3="Option C",
+                            #   option_4="Option D",
+                            #   right_option="Option A"
+                            # )
+
+                    messages.success(request, f'AI Quiz: {topic} added to your quiz list.')
+                else:
+                    name = request.POST['name']
+                    point = int(request.POST['each_point'])
+
+                    getstaff = Staff.objects.filter(profile_id=int(request.session['account_id'])).first()
+
+                    quiz = Quiz()
+                    quiz.name = name.title()
+                    quiz.each_point = point
+                    quiz.profile = Profile.objects.get(pk=int(request.session['account_id']))
+                    quiz.staff = Staff.objects.get(pk=int(getstaff.id))
+                    quiz.save()
+                    messages.success(request, f'{name.title()} added to your quiz list.')
+
+                quizes = Quiz.objects.filter(profile_id=int(request.session['account_id']))
                 content['quizs'] = quizes
+
             return render(request, 'staff/quiz/quiz.html', content)
         else:
             return HttpResponseForbidden()
