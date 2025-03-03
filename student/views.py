@@ -497,3 +497,22 @@ def feedback(request):
     else:
         messages.error(request, "Please login first.")
         return HttpResponseRedirect(reverse('account-login'))
+
+def lecture(request):
+    if request.session.has_key('account_id'):
+        if(request.session['account_role'] == 3):
+            content = {}
+            content['title'] = 'Your Lectures'
+            content['data'] = StudentAttendance.objects.filter(student_profile_id=int(request.session['account_id']))
+            return render(request, 'student/lectures.html', content)
+        else:
+            return HttpResponseForbidden()
+    else:
+        messages.error(request, "Please login first.")
+        return HttpResponseRedirect(reverse('account-login'))
+
+def python_lecture(request):
+    return render(request, 'student/python_lecture.html', {'title': 'Python Lecture'})
+
+def sql_lecture(request):
+    return render(request, 'student/sql_lecture.html', {'title': 'SQL Lecture'})

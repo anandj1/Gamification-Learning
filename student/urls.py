@@ -17,4 +17,7 @@ urlpatterns = [
     path('event', views.event, name='std-event'),
     path('event-apply/<int:pk>', views.eventApply, name='std-event-apply'),
     path('feedback', views.feedback, name='std-feedback'),
+    path('lecture', views.lecture, name='std-lecture'),
+    path('student/python-lecture/', views.python_lecture, name='python-lecture'),
+    path('student/sql-lecture/', views.sql_lecture, name='sql-lecture'),
 ]

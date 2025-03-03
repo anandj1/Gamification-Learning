@@ -1,0 +1,17 @@
+{% extends 'layouts/student.html' %}
+{% load static %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2 class="text-primary">{{ title }}</h2>
+    </div>
+
+    <div class="col-md-6">
+        <a href="{% url 'python-lecture' %}" target="_blank" class="btn btn-primary btn-lg mt-3">Python Lecture</a>
+    </div>
+
+    <div class="col-md-6">
+        <a href="{% url 'sql-lecture' %}" target="_blank" class="btn btn-success btn-lg mt-3">SQL Lecture</a>
+    </div>
+</div>
+{% endblock %}
